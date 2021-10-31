@@ -3,7 +3,7 @@ import {
 } from "./CircleDigitizer.js";
 
 // var parent = require("CircleDigitizer")
-class Test extends CircleDigitizer {
+class Part2 extends CircleDigitizer {
 	constructor(squares, bPart_1) {
 		super(squares, false);
 	}
@@ -11,11 +11,11 @@ class Test extends CircleDigitizer {
 
 
 window.onload = function () {
-	var obj = new Test([]);
+	var obj = new Part2([]);
 	let clickedCoordinate = null;
 
-	obj.getSquares();
-	obj.fillGrid();
+	obj.drawGrid();
+	obj.colorGrid();
 
 	canvas.onmousedown = function (e) {
 		obj.updateCanvas();
