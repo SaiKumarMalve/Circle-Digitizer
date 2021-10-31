@@ -26,11 +26,11 @@ export class CircleDigitizer {
 		this.endPt = null;
 		this.ctx = canvas.getContext('2d');
 		this.bPart_1 = true;
-		this.getSquares();
-		this.fillGrid();
+		this.drawGrid();
+		this.colorGrid();
 	}
 
-	getSquares() {
+	drawGrid() {
 		let counter = 1;
 		for (let i = 20; i <= 400; i += 20) {
 			for (let j = 20; j <= 400; j += 20) {
@@ -59,30 +59,52 @@ export class CircleDigitizer {
 	}
 
 	// Fills grid with squares
-	fillGrid() {
+	colorGrid() {
 		for (let i = 1; i < this.squares.length; i++) {
 
 			if (this.bPart_1 && this.endPt) {
 				if (this.getBlueSquares(i)) {
 					this.ctx.fillStyle = "blue";
 				} else {
-					this.ctx.fillStyle = "gray";
+					this.ctx.fillStyle = "#D3D3D3";
 				}
 			} else if (!this.bPart_1 && this.blueSquares.includes(this.squares[i])) {
 				this.ctx.fillStyle = "blue";
 			} else {
-				this.ctx.fillStyle = "gray";
+				this.ctx.fillStyle = "#D3D3D3";
 			}
 			this.ctx.fillRect(this.squares[i].x, this.squares[i].y, 10, 10);
 		}
 		if (this.endPt) {
-			this.createRedCircles();
+			this.drawRedCircles();
 		}
 	}
+
+    setCenter(eventX, eventY) {
+		this.center = {
+			x: eventX,
+			y: eventY
+		}
+	}
+
+	setMovingMouse(eventX, eventY) {
+		this.movingMouse = {
+			x: eventX,
+			y: eventY
+		}
+	}
+
+	setEndPoint(eventX, eventY) {
+		this.endPt = {
+			x: eventX,
+			y: eventY
+		}
+	}
+
 	//Updating canvas 
 	updateCanvas() {
 		this.ctx.clearRect(0, 0, 430, 430);
-		this.fillGrid();
+		this.colorGrid();
 	}
 
 
@@ -95,8 +117,6 @@ export class CircleDigitizer {
 			}
 		}
 	}
-
-
 	// Generates blue circle based on blue squares
 	generateCircle() {
 		let center = this.getCenter();
@@ -108,11 +128,19 @@ export class CircleDigitizer {
 
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "blue";
-		this.ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+		this.ctx.arc(center.x , center.y, radius, 0, 2 * Math.PI);
 		this.ctx.stroke();
 		return;
 	}
 
+	getAngle() {
+		let angle = 0;
+		if(this.blueSquares.length < 2)
+			return angle;
+		for(var i = 0; i < this.blueSquares.length - 1 ; ++i)
+			angle += Math.atan2(this.blueSquares[i+1].y - this.blueSquares[i].y, this.blueSquares[i+1].x - this.blueSquares[i].x) * 180 / Math.PI;
+		return angle/this.blueSquares.length;
+	}
 	// Generates blue circle based on blue squares
 	generateEllipse() {
 		let center = this.getCenter();
@@ -132,32 +160,12 @@ export class CircleDigitizer {
 		}
 		let longSide = (Math.sqrt((A.y - B.y) * (A.y - B.y) + (B.x - A.x) * (B.x - A.x)));
 
+        let angle = this.getAngle();
 		this.ctx.beginPath();
-		this.ctx.strokeStyle = "blue";
-		this.ctx.ellipse(center.x, center.y, longSide, radius, 0, 0, 2 * Math.PI);
+		this.ctx.strokeStyle = "red";
+		this.ctx.ellipse(center.x, center.y, longSide, radius, angle, 0, 2 * Math.PI);
 		this.ctx.stroke();
 		return;
-	}
-
-	setCenter(eventX, eventY) {
-		this.center = {
-			x: eventX,
-			y: eventY
-		}
-	}
-
-	setMovingMouse(eventX, eventY) {
-		this.movingMouse = {
-			x: eventX,
-			y: eventY
-		}
-	}
-
-	setEndPoint(eventX, eventY) {
-		this.endPt = {
-			x: eventX,
-			y: eventY
-		}
 	}
 
 	// Checks if point selected is on square
@@ -235,7 +243,7 @@ export class CircleDigitizer {
 	}
 
 	// Creates blue circle
-	createBlueCircle() {
+	drawBlueCircle() {
 		this.updateCanvas();
 		if (this.endPt) {
 			this.radius = this.getDistance(this.center.x, this.center.y, this.endPt.x, this.endPt.y);
@@ -252,7 +260,7 @@ export class CircleDigitizer {
 
 
 	// Creates red circles
-	createRedCircles() {
+	drawRedCircles() {
 
 		this.largeRedRadius = this.radius;
 		this.smallRedRadius = this.radius;
