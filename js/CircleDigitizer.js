@@ -1,41 +1,44 @@
 export class CircleDigitizer {
-	movingMouse;
+	mouseXY;
 	radius = 0;
-	furthestOutsideBlue = null;
-	furthestInsideBlue = null;
-	smallRedRadius = null;
-	largeRedRadius = null;
-	blueSquares = [];
+	closesetBoxOutside = null;
+	closesetBoxInside = null;
+	innerCircleRadius = null;
+	outerCircleRadius = null;
+	toggledSquares = [];
 
+	//Constructor calls sets the canvas and initializes the class
 	constructor(squares, bPart_1, endPt) {
 		this.squares = squares;
-		this.endPt = endPt;
+		this.endPoint = endPt;
 		this.ctx = canvas.getContext('2d');
 		this.bPart_1 = bPart_1;
 	}
 
+	//Resets all the variables when the grid is reset
 	reset() {
-		this.movingMouse = null;
+		this.mouseXY = null;
 		this.radius = 0;
-		this.furthestOutsideBlue = null;
-		this.furthestInsideBlue = null;
-		this.smallRedRadius = null;
-		this.largeRedRadius = null;
-		this.blueSquares = [];
+		this.closesetBoxOutside = null;
+		this.closesetBoxInside = null;
+		this.innerCircleRadius = null;
+		this.outerCircleRadius = null;
+		this.toggledSquares = [];
 		this.squares = [];
-		this.endPt = null;
+		this.endPoint = null;
 		this.ctx = canvas.getContext('2d');
 		this.bPart_1 = true;
 		this.drawGrid();
 		this.colorGrid();
 	}
 
+	//Creates the squares to be fit into the grid
 	drawGrid() {
-		let counter = 1;
+		let count = 1;
 		for (let i = 20; i <= 400; i += 20) {
 			for (let j = 20; j <= 400; j += 20) {
 				if (!this.bPart_1) {
-					this.squares[counter] = {
+					this.squares[count] = {
 						x: i,
 						y: j,
 						width: 20,
@@ -46,40 +49,41 @@ export class CircleDigitizer {
 						}
 					}
 				} else {
-					this.squares[counter] = {
+					this.squares[count] = {
 						x: i,
 						y: j,
 						width: 20,
 						height: 20
 					}
 				}
-				counter++;
+				count++;
 			}
 		}
 	}
 
-	// Fills grid with squares
+	// Fills grid with squares and colors the grids
 	colorGrid() {
 		for (let i = 1; i < this.squares.length; i++) {
 
-			if (this.bPart_1 && this.endPt) {
+			if (this.bPart_1 && this.endPoint) {
 				if (this.getBlueSquares(i)) {
 					this.ctx.fillStyle = "blue";
 				} else {
 					this.ctx.fillStyle = "#D3D3D3";
 				}
-			} else if (!this.bPart_1 && this.blueSquares.includes(this.squares[i])) {
+			} else if (!this.bPart_1 && this.toggledSquares.includes(this.squares[i])) {
 				this.ctx.fillStyle = "blue";
 			} else {
 				this.ctx.fillStyle = "#D3D3D3";
 			}
 			this.ctx.fillRect(this.squares[i].x, this.squares[i].y, 10, 10);
 		}
-		if (this.endPt) {
+		if (this.endPoint) {
 			this.drawRedCircles();
 		}
 	}
 
+	//Sets the center of the circle for Part 1
     setCenter(eventX, eventY) {
 		this.center = {
 			x: eventX,
@@ -87,42 +91,45 @@ export class CircleDigitizer {
 		}
 	}
 
+	//Captures the x and y co-ordinates as the mouse moves
 	setMovingMouse(eventX, eventY) {
-		this.movingMouse = {
+		this.mouseXY = {
 			x: eventX,
 			y: eventY
 		}
 	}
 
+	//Captures the end point when the mouse is released.
 	setEndPoint(eventX, eventY) {
-		this.endPt = {
+		this.endPoint = {
 			x: eventX,
 			y: eventY
 		}
 	}
 
-	//Updating canvas 
+	//Updating canvas with colors
 	updateCanvas() {
 		this.ctx.clearRect(0, 0, 430, 430);
 		this.colorGrid();
 	}
 
 
-	// Finds squares selected and saves in blueSquares array
+	// Sets the clicked square to the blue color
 	getBlueSquare(coordinate) {
 		for (let i = 1; i < this.squares.length; i++) {
 			if (this.checkCollision(coordinate, this.squares[i])) {
-				this.blueSquares.push(this.squares[i]);
+				this.toggledSquares.push(this.squares[i]);
 				this.updateCanvas();
 			}
 		}
 	}
-	// Generates blue circle based on blue squares
+
+	// Generates the blue circle based on blue squares in Part 2
 	generateCircle() {
 		let center = this.getCenter();
 		let distances = [];
-		for (let i = 0; i < this.blueSquares.length; i++) {
-			distances.push(this.getDistance(this.blueSquares[i], center));
+		for (let i = 0; i < this.toggledSquares.length; i++) {
+			distances.push(this.getDistance(this.toggledSquares[i], center));
 		}
 		let radius = this.getAverageDistance(distances);
 
@@ -133,20 +140,22 @@ export class CircleDigitizer {
 		return;
 	}
 
+	//Finds the angle between the points selected
 	getAngle() {
 		let angle = 0;
-		if(this.blueSquares.length < 2)
+		if(this.toggledSquares.length < 2)
 			return angle;
-		for(var i = 0; i < this.blueSquares.length - 1 ; ++i)
-			angle += Math.atan2(this.blueSquares[i+1].y - this.blueSquares[i].y, this.blueSquares[i+1].x - this.blueSquares[i].x) * 180 / Math.PI;
-		return angle/this.blueSquares.length;
+		for(var i = 0; i < this.toggledSquares.length - 1 ; ++i)
+			angle += Math.atan2(this.toggledSquares[i+1].y - this.toggledSquares[i].y, this.toggledSquares[i+1].x - this.toggledSquares[i].x) * 180 / Math.PI;
+		return angle/this.toggledSquares.length;
 	}
-	// Generates blue circle based on blue squares
+
+	// Generates a red ellipse based on the points/squares selected
 	generateEllipse() {
 		let center = this.getCenter();
 		let distances = [];
-		for (let i = 0; i < this.blueSquares.length; i++) {
-			distances.push(this.getDistance(this.blueSquares[i], center));
+		for (let i = 0; i < this.toggledSquares.length; i++) {
+			distances.push(this.getDistance(this.toggledSquares[i], center));
 		}
 		let radius = this.getAverageDistance(distances);
 
@@ -168,7 +177,7 @@ export class CircleDigitizer {
 		return;
 	}
 
-	// Checks if point selected is on square
+	// Checks if point selected is on the square or in the empty space
 	checkCollision(point, square) {
 		if (point.x < square.x + square.width &&
 			point.x + point.width > square.x &&
@@ -179,7 +188,7 @@ export class CircleDigitizer {
 	}
 
 
-	// Returns the average center coordinate of blue squares
+	// Returns the average center coordinate of the selected squares
 	getCenter() {
 		return {
 			x: this.getAverageX(),
@@ -191,20 +200,20 @@ export class CircleDigitizer {
 	// Gets the average X coordinates of blue squares
 	getAverageX() {
 		let sum = 0;
-		for (let i = 0; i < this.blueSquares.length; i++) {
-			sum += this.blueSquares[i].centerOfSquare.x;
+		for (let i = 0; i < this.toggledSquares.length; i++) {
+			sum += this.toggledSquares[i].centerOfSquare.x;
 		}
-		return (sum / this.blueSquares.length);
+		return (sum / this.toggledSquares.length);
 	}
 
 
 	// Gets the average Y coordinates of blue squares
 	getAverageY() {
 		let sum = 0;
-		for (let i = 0; i < this.blueSquares.length; i++) {
-			sum += this.blueSquares[i].centerOfSquare.y;
+		for (let i = 0; i < this.toggledSquares.length; i++) {
+			sum += this.toggledSquares[i].centerOfSquare.y;
 		}
-		return (sum / this.blueSquares.length);
+		return (sum / this.toggledSquares.length);
 	}
 
 
@@ -233,8 +242,8 @@ export class CircleDigitizer {
 			point = this.getPoint(k * (Math.PI / 180), this.radius);
 			if (this.checkCollision(point, this.squares[index])) {
 				this.getFurthest(index, point);
-				if (!this.blueSquares.includes(this.squares[index])) {
-					this.blueSquares.push(this.squares[index]);
+				if (!this.toggledSquares.includes(this.squares[index])) {
+					this.toggledSquares.push(this.squares[index]);
 				}
 				return true;
 			}
@@ -245,10 +254,10 @@ export class CircleDigitizer {
 	// Creates blue circle
 	drawBlueCircle() {
 		this.updateCanvas();
-		if (this.endPt) {
-			this.radius = this.getDistance(this.center.x, this.center.y, this.endPt.x, this.endPt.y);
+		if (this.endPoint) {
+			this.radius = this.getDistance(this.center.x, this.center.y, this.endPoint.x, this.endPoint.y);
 		} else {
-			this.radius = this.getDistance(this.center.x, this.center.y, this.movingMouse.x, this.movingMouse.y);
+			this.radius = this.getDistance(this.center.x, this.center.y, this.mouseXY.x, this.mouseXY.y);
 		}
 
 		this.ctx.beginPath();
@@ -262,10 +271,10 @@ export class CircleDigitizer {
 	// Creates red circles
 	drawRedCircles() {
 
-		this.largeRedRadius = this.radius;
-		this.smallRedRadius = this.radius;
-		let r1 = this.outsideCircle(this.largeRedRadius);
-		let r2 = this.insideCircle(this.smallRedRadius);
+		this.outerCircleRadius = this.radius;
+		this.innerCircleRadius = this.radius;
+		let r1 = this.outsideCircle(this.outerCircleRadius);
+		let r2 = this.insideCircle(this.innerCircleRadius);
 
 		if (r1 <= 0 || r2 <= 0) {
 			location.reload();
@@ -288,32 +297,32 @@ export class CircleDigitizer {
 
 	// Outter red circle
 	outsideCircle(r) {
-		for (let i = 0; i < this.blueSquares.length; i++) {
+		for (let i = 0; i < this.toggledSquares.length; i++) {
 			for (let k = 0; k < 360; k += 5) {
 				let point = this.getPoint(k * (Math.PI / 180), r);
 
-				if (this.checkCollision(point, this.blueSquares[i])) {
-					this.largeRedRadius += 1;
-					return this.outsideCircle(this.largeRedRadius);
+				if (this.checkCollision(point, this.toggledSquares[i])) {
+					this.outerCircleRadius += 1;
+					return this.outsideCircle(this.outerCircleRadius);
 				}
 			}
 		}
-		return this.largeRedRadius;
+		return this.outerCircleRadius;
 	}
 
 
 	// Inner red circle
 	insideCircle(r) {
-		for (let i = 0; i < this.blueSquares.length; i++) {
+		for (let i = 0; i < this.toggledSquares.length; i++) {
 			for (let k = 0; k < 360; k += 5) {
 				let point = this.getPoint(k * (Math.PI / 180), r);
-				if (this.checkCollision(point, this.blueSquares[i])) {
-					this.smallRedRadius -= 1;
-					return this.insideCircle(this.smallRedRadius);
+				if (this.checkCollision(point, this.toggledSquares[i])) {
+					this.innerCircleRadius -= 1;
+					return this.insideCircle(this.innerCircleRadius);
 				}
 			}
 		}
-		return this.smallRedRadius;
+		return this.innerCircleRadius;
 	}
 
 	// Gets the coordinate of point on circle
@@ -332,15 +341,15 @@ export class CircleDigitizer {
 
 		let newDistance = this.getDistance(point.x, point.y, this.squares[index].x, this.squares[index].y);
 		if (this.isInsideCircle(index)) {
-			if (this.furthestInsideBlue === null || this.furthestInsideBlue.distance < newDistance) {
-				this.furthestInsideBlue = {
+			if (this.closesetBoxInside === null || this.closesetBoxInside.distance < newDistance) {
+				this.closesetBoxInside = {
 					theSquare: this.squares[index],
 					circlePoint: point,
 					distance: newDistance
 				}
 			} else {
-				if (this.furthestOutsideBlue === null || this.furthestOutsideBlue.distance < newDistance) {
-					this.furthestOutsideBlue = {
+				if (this.closesetBoxOutside === null || this.closesetBoxOutside.distance < newDistance) {
+					this.closesetBoxOutside = {
 						theSquare: this.squares[index],
 						circlePoint: point,
 						distance: newDistance
