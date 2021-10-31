@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+   <script>
+      function resizeIframe(obj) {
+          obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
+      }
+   </script>
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <link rel="stylesheet" href="stylesheet.css">
+      <title>Software Assessment</title>
+      <link rel = "icon" href = 
+         "https://idataresearch.com/wp-content/uploads/2020/02/neo.png" 
+         type = "image/x-icon">
+   </head>
+   <body>
+      <div class='container'>
+         <img src="https://idataresearch.com/wp-content/uploads/2020/02/neo.png" alt="Neocis Inc.">
+         <h1>Software Assessment</h1>
+      </div>
+      <div class='container'>
+         <iframe src="html/Circle_1.html" onload="resizeIframe(this)" title="Circle_1"></iframe>
+         <iframe src="html/Circle_2.html" onload="resizeIframe(this)" title="Circle_2"></iframe>
+      </div>
+   </body>
+</html>
