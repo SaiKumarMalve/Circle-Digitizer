@@ -19,8 +19,8 @@ drawGrid()
 1. Rows = 20
 2. Columns = 20
 3. for each Row in Rows
-4.   for each Column in Columns
-5.     Draw a Sqaure and store the points in Squares
+4. for each Column in Columns
+5. Draw a Sqaure and store the points in Squares
 6. end
 7. end
 
