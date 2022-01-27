@@ -1,6 +1,6 @@
 # Circle Digitizer
 
-[Click here to check out the demo!](https://skmalve.github.io/Circle-Digitizer/)
+[Click here to check out the demo!](https://SaiKumarMalve.github.io/Circle-Digitizer/)
 
 -----
 
